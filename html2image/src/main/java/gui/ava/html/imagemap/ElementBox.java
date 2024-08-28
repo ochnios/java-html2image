@@ -1,18 +1,19 @@
 package gui.ava.html.imagemap;
 
-import org.w3c.dom.Element;
-
 import java.util.Collection;
+
+import org.w3c.dom.Element;
 
 /**
  * @author Yoav Aharoni
  */
 public class ElementBox {
-	private Element element;
-	private int left;
-	private int top;
-	private int width;
-	private int height;
+
+	private final Element element;
+	private final int left;
+	private final int top;
+	private final int width;
+	private final int height;
 
 	public ElementBox(Element element, int left, int top, int width, int height) {
 		this.element = element;
@@ -54,17 +55,22 @@ public class ElementBox {
 		return width <= 0 || height <= 0;
 	}
 
-	public boolean containedIn(Collection<ElementBox> elementBoxes) {
-		for (ElementBox box : elementBoxes) {
-			if (containedIn(box)) {
-				return true;
-			}
-		}
-		return false;
+	public boolean containedIn(ElementBox box) {
+		return containedIn(this, box);
 	}
 
-	public boolean containedIn(ElementBox box) {
-		return getTop() >= box.getTop() && getLeft() >= box.getTop()
-				&& getBottom() <= box.getBottom() && getRight() <= box.getRight();
+	public boolean containedIn(Collection<ElementBox> elementBoxes) {
+		return elementBoxes.stream().anyMatch(this::containedIn);
 	}
+
+	/**
+	 * @param box box to test
+	 * @param other the other {@link ElementBox}
+	 * @return true if box is contained inside the other {@link ElementBox}
+	 */
+	public static boolean containedIn(ElementBox box, ElementBox other) {
+		return box.getTop() >= other.getTop() && box.getLeft() >= other.getTop()
+				&& box.getBottom() <= other.getBottom() && box.getRight() <= other.getRight();
+	}
+
 }

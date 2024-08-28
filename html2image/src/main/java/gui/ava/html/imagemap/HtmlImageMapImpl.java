@@ -1,34 +1,46 @@
 package gui.ava.html.imagemap;
 
-import gui.ava.html.exception.RenderException;
-import gui.ava.html.renderer.LayoutHolder;
-import org.apache.commons.lang.StringUtils;
+import static java.lang.String.format;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
+import gui.ava.html.exception.RenderException;
+import gui.ava.html.renderer.LayoutHolder;
 import org.xhtmlrenderer.layout.Styleable;
 import org.xhtmlrenderer.render.BlockBox;
 import org.xhtmlrenderer.render.Box;
 import org.xhtmlrenderer.render.InlineLayoutBox;
 import org.xhtmlrenderer.render.LineBox;
 
-import java.io.*;
-import java.util.*;
-
-import static java.lang.String.format;
-
 /**
  * @author Yoav Aharoni
  */
 public class HtmlImageMapImpl implements HtmlImageMap {
-	private static Set<String> searchedAttributes = stringSet("href", "onclick", "ondblclick", "onmousedown", "onmouseup");
-	private static Set<String> allowedAttributes = stringSet(
+
+	private static final Set<String> searchedAttributes = Set.of("href", "onclick", "ondblclick", "onmousedown", "onmouseup");
+
+	private static final Set<String> allowedAttributes = Set.of(
 			"href", "target", "title", "class", "tabindex", "dir", "lang", "accesskey",
 			"onblur", "onclick", "ondblclick", "onfocus",
 			"onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup",
 			"onkeydown", "onkeypress", "onkeyup");
 
-	private LayoutHolder layoutHolder;
+	private final LayoutHolder layoutHolder;
 
 	public HtmlImageMapImpl(LayoutHolder layoutHolder) {
 		this.layoutHolder = layoutHolder;
@@ -120,12 +132,11 @@ public class HtmlImageMapImpl implements HtmlImageMap {
 	@Override
 	public Map<Element, Collection<ElementBox>> getClickableBoxes() {
 		final Box rootBox = layoutHolder.getRootBox();
-		final HashMap<Element, Collection<ElementBox>> boxes = new HashMap<Element, Collection<ElementBox>>();
-		addClickableElements(rootBox, boxes, new HashSet<Styleable>());
+		final HashMap<Element, Collection<ElementBox>> boxes = new HashMap<>();
+		addClickableElements(rootBox, boxes, new HashSet<>());
 		return boxes;
 	}
 
-	@SuppressWarnings({"unchecked"})
 	private void addClickableElements(Styleable styleable, HashMap<Element, Collection<ElementBox>> boxes, Set<Styleable> visited) {
 		if (styleable == null || visited.contains(styleable)) {
 			return;
@@ -134,26 +145,26 @@ public class HtmlImageMapImpl implements HtmlImageMap {
 
 		addIfClickable(styleable, boxes);
 
-		if (styleable instanceof Box) {
-			for (Styleable child : (List<Styleable>) ((Box) styleable).getChildren()) {
+		if (styleable instanceof Box box) {
+			for (Styleable child : box.getChildren()) {
 				addClickableElements(child, boxes, visited);
 			}
 		}
-		if (styleable instanceof InlineLayoutBox) {
-			for (Object child : (List<?>) ((InlineLayoutBox) styleable).getInlineChildren()) {
-				if (child instanceof Styleable) {
-					addClickableElements((Styleable) child, boxes, visited);
+		if (styleable instanceof InlineLayoutBox inlineLayoutBox) {
+			for (Object child : inlineLayoutBox.getInlineChildren()) {
+				if (child instanceof Styleable styleableChild) {
+					addClickableElements(styleableChild, boxes, visited);
 				}
 			}
-		} else if (styleable instanceof BlockBox) {
-			final List<Styleable> content = (List<Styleable>) ((BlockBox) styleable).getInlineContent();
+		} else if (styleable instanceof BlockBox blockBox) {
+			final List<Styleable> content = blockBox.getInlineContent();
 			if (content != null) {
 				for (Styleable child : content) {
 					addClickableElements(child, boxes, visited);
 				}
 			}
-		} else if (styleable instanceof LineBox) {
-			for (Styleable child : (List<Styleable>) ((LineBox) styleable).getNonFlowContent()) {
+		} else if (styleable instanceof LineBox lineBox) {
+			for (Styleable child : lineBox.getNonFlowContent()) {
 				addClickableElements(child, boxes, visited);
 			}
 		}
@@ -170,7 +181,7 @@ public class HtmlImageMapImpl implements HtmlImageMap {
 		}
 		Collection<ElementBox> elementBoxes = boxes.get(clickable);
 		if (elementBoxes == null) {
-			elementBoxes = new ArrayList<ElementBox>();
+			elementBoxes = new ArrayList<>();
 			boxes.put(clickable, elementBoxes);
 			elementBoxes.add(elementBox);
 			return;
@@ -181,14 +192,12 @@ public class HtmlImageMapImpl implements HtmlImageMap {
 	}
 
 	private ElementBox createElementBox(Styleable styleable, Element element) {
-		if (styleable instanceof InlineLayoutBox) {
-			final InlineLayoutBox box = (InlineLayoutBox) styleable;
-			final int width = Math.max(box.getInlineWidth(), box.getWidth());
+		if (styleable instanceof InlineLayoutBox box) {
+            final int width = Math.max(box.getInlineWidth(), box.getWidth());
 			return new ElementBox(element, box.getAbsX(), box.getAbsY(), width, box.getHeight());
 		}
-		if (styleable instanceof Box) {
-			final Box box = (Box) styleable;
-			return new ElementBox(element, box.getAbsX(), box.getAbsY(), box.getWidth(), box.getHeight());
+		if (styleable instanceof Box box) {
+            return new ElementBox(element, box.getAbsX(), box.getAbsY(), box.getWidth(), box.getHeight());
 		}
 		return null;
 	}
@@ -208,14 +217,11 @@ public class HtmlImageMapImpl implements HtmlImageMap {
 	private boolean isClickable(Element element) {
 		for (String attribute : searchedAttributes) {
 			final String value = element.getAttribute(attribute);
-			if (StringUtils.isNotBlank(value)) {
+			if (org.apache.commons.lang3.StringUtils.isNotBlank(value)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private static HashSet<String> stringSet(String... items) {
-		return new HashSet<String>(Arrays.asList(items));
-	}
 }

@@ -1,25 +1,37 @@
 package gui.ava.html.renderer;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+
+import org.w3c.dom.Document;
+
 import gui.ava.html.exception.RenderException;
 import gui.ava.html.parser.DocumentHolder;
-import org.w3c.dom.Document;
+import gui.ava.html.util.FormatNameUtil;
 import org.xhtmlrenderer.render.Box;
 import org.xhtmlrenderer.simple.Graphics2DRenderer;
 import org.xhtmlrenderer.util.FSImageWriter;
-
-import javax.imageio.ImageWriteParam;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
 
 /**
  * @author Yoav Aharoni
  */
 public class ImageRendererImpl implements ImageRenderer {
+
+	private static final Set<String> IMAGE_FORMAT_WITH_ALPHA = Set.of("gif","png");
+
 	public static final int DEFAULT_WIDTH = 1024;
 	public static final int DEFAULT_HEIGHT = 768;
 
-	private DocumentHolder documentHolder;
+	private final DocumentHolder documentHolder;
 
 	private int width = DEFAULT_WIDTH;
 	private int height = DEFAULT_HEIGHT;
@@ -190,31 +202,34 @@ public class ImageRendererImpl implements ImageRenderer {
 
 	private void save(OutputStream outputStream, String filename, boolean closeStream) {
 		try {
-			final String imageFormat = getImageFormat(filename);
-			final FSImageWriter imageWriter = getImageWriter(imageFormat);
-			final boolean isBMP = "bmp".equalsIgnoreCase(imageFormat);
-			final BufferedImage bufferedImage = getBufferedImage(isBMP ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB);
-			imageWriter.write(bufferedImage, outputStream);
-		} catch (IOException e) {
+			final String imageFormat = FormatNameUtil.formatForFilename(filename);
+			final boolean hasAlpha = IMAGE_FORMAT_WITH_ALPHA.contains(imageFormat);
+			final BufferedImage bufferedImage = getBufferedImage(hasAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
+
+			// note: if you use the FSImageWriter the output stream will always get closed!
+			// final FSImageWriter imageWriter = getImageWriter(imageFormat);
+			// imageWriter.write(bufferedImage, outputStream);
+
+			ImageIO.write(bufferedImage, imageFormat, outputStream);
+		}
+		catch (IOException e) {
 			throw new RenderException("IOException while rendering image", e);
-		} finally {
+		}
+		finally {
 			if (closeStream) {
 				try {
 					outputStream.close();
-				} catch (IOException ignore) {
 				}
+				catch (IOException ignore) {}
 			}
 		}
 	}
 
-	private FSImageWriter getImageWriter(String imageFormat) {
-		FSImageWriter imageWriter = new FSImageWriter(imageFormat);
-		imageWriter.setWriteCompressionMode(writeCompressionMode);
-		imageWriter.setWriteCompressionQuality(writeCompressionQuality);
-		imageWriter.setWriteCompressionType(writeCompressionType);
-		return imageWriter;
-	}
-
+	/**
+	 * note: do not cache the format, otherwise multiple calls will return the same value! :)
+	 * @deprecated use {@link FormatNameUtil#formatForFilename(String)}
+	 */
+	@Deprecated
 	private String getImageFormat(String filename) {
 		if (this.imageFormat != null) {
 			return imageFormat;
@@ -222,6 +237,17 @@ public class ImageRendererImpl implements ImageRenderer {
 		if (filename != null) {
 			return FormatNameUtil.formatForFilename(filename);
 		}
-		return FormatNameUtil.getDefaultFormat();
+		return FormatNameUtil.DEFAULT_FORMAT;
 	}
+
+	private FSImageWriter getImageWriter(String imageFormat) {
+		// todo: the new version can't be customized ...
+		//       try to subclass it and override the getImageWriteParameters method
+		FSImageWriter imageWriter = new FSImageWriter(imageFormat);
+//		imageWriter.setWriteCompressionMode(writeCompressionMode);
+//		imageWriter.setWriteCompressionQuality(writeCompressionQuality);
+//		imageWriter.setWriteCompressionType(writeCompressionType);
+		return imageWriter;
+	}
+
 }

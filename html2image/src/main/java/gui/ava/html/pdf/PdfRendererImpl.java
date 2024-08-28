@@ -1,18 +1,24 @@
 package gui.ava.html.pdf;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.w3c.dom.Document;
+
 import com.lowagie.text.DocumentException;
 import gui.ava.html.exception.RenderException;
 import gui.ava.html.parser.DocumentHolder;
-import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
-
-import java.io.*;
 
 /**
  * @author Yoav Aharoni
  */
 public class PdfRendererImpl implements PdfRenderer {
-	private DocumentHolder documentHolder;
+
+	private final DocumentHolder documentHolder;
 
 	public PdfRendererImpl(DocumentHolder documentHolder) {
 		this.documentHolder = documentHolder;
@@ -51,4 +57,5 @@ public class PdfRendererImpl implements PdfRenderer {
 	public void saveToPDF(String file) {
 		saveToPDF(new File(file));
 	}
+
 }

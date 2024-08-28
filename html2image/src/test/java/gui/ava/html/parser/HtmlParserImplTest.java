@@ -1,25 +1,27 @@
 package gui.ava.html.parser;
 
-import gui.ava.html.BaseTest;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.util.ResourceUtils;
-import org.w3c.dom.Document;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.net.URL;
+import java.net.URI;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.w3c.dom.Document;
+
+import gui.ava.html.BaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yoav Aharoni
  */
 public class HtmlParserImplTest extends BaseTest {
+
 	private HtmlParserImpl parser;
 
-	@Before
+	@BeforeEach
 	public void createParser() {
 		parser = new HtmlParserImpl();
 	}
@@ -32,25 +34,25 @@ public class HtmlParserImplTest extends BaseTest {
 
 	@Test
 	public void testLoadExternalURL() throws Exception {
-		parser.load(new URL("http://www.google.co.il"));
+		parser.load(new URI("https://www.google.co.il").toURL());
 		assertTrue(getDocument().getElementsByTagName("div").getLength() > 0);
 	}
 
 	@Test
 	public void testLoadFile() throws Exception {
-		parser.load(ResourceUtils.getFile(TEST1_PATH));
+		parser.load(getTest1Url());
 		assertTest1();
 	}
 
 	@Test
 	public void testLoadReader() throws Exception {
-		parser.load(new FileReader(ResourceUtils.getFile(TEST1_PATH)));
+		parser.load(new FileReader(getTest1File()));
 		assertTest1();
 	}
 
 	@Test
 	public void testLoadInputStream() throws Exception {
-		parser.load(new FileInputStream(ResourceUtils.getFile(TEST1_PATH)));
+		parser.load(new FileInputStream(getTest1File()));
 		assertTest1();
 	}
 
@@ -67,4 +69,5 @@ public class HtmlParserImplTest extends BaseTest {
 	private Document getDocument() {
 		return parser.getDocument();
 	}
+
 }
