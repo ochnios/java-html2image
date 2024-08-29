@@ -8,13 +8,13 @@ import gui.ava.html.image.HtmlImageGenerator;
 public class Example extends BaseTest {
 
     private static final String html = """
+            <!doctype html>
             <html>
             <head>
                 <!-- commented style :)
                 <style>
                     div { border: 2px solid red; text-align: center; }
                 </style>
-                -->
             </head>
             <body>
                 <h1>Hello World!</h1>

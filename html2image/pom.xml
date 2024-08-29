@@ -28,11 +28,26 @@
 
 		<!-- ==== PARSING ====================================== -->
 
+		<!-- NekoHtml 1.9.x -->
 		<dependency>
-			<groupId>org.htmlunit</groupId>
-			<artifactId>neko-htmlunit</artifactId>
-			<version>4.4.0</version>
+			<groupId>net.sourceforge.nekohtml</groupId>
+			<artifactId>nekohtml</artifactId>
+			<version>1.9.22</version>
 		</dependency>
+
+			<!-- Neko HtmlUnit version without Xerces is very limited! -->
+<!--		<dependency>-->
+<!--			<groupId>org.htmlunit</groupId>-->
+<!--			<artifactId>neko-htmlunit</artifactId>-->
+<!--			<version>4.4.0</version>-->
+<!--		</dependency>-->
+
+			<!-- Also the official HtmlUnit 4.x is very limited! -->
+<!--		<dependency>-->
+<!--			<groupId>org.htmlunit</groupId>-->
+<!--			<artifactId>htmlunit</artifactId>-->
+<!--			<version>4.4.0</version>-->
+<!--		</dependency>-->
 
 		<!-- ==== RENDERING ================================================== -->
 

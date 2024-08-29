@@ -8,7 +8,7 @@ import java.net.URL;
 
 import org.w3c.dom.Document;
 
-import org.htmlunit.cyberneko.parsers.DOMParser;
+import org.apache.xerces.parsers.DOMParser;
 
 /**
  * @author Yoav Aharoni

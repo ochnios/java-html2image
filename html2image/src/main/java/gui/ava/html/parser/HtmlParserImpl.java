@@ -16,8 +16,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
-import org.htmlunit.cyberneko.html.dom.HTMLDocumentImpl;
-import org.htmlunit.cyberneko.parsers.DOMParser;
+import org.apache.xerces.parsers.DOMParser;
+import org.cyberneko.html.HTMLConfiguration;
 
 /**
  * @author Yoav Aharoni
@@ -29,7 +29,8 @@ public class HtmlParserImpl implements HtmlParser {
 
 	public HtmlParserImpl() {
 		try {
-			domParser = new DOMParser(HTMLDocumentImpl.class);
+			domParser = new DOMParser(new HTMLConfiguration()); 	// HtmlUnit 1.9.x
+			// domParser = new DOMParser(HTMLDocumentImpl.class); 	// HtmlUnit 4.x
 			domParser.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
 		}
 		catch (SAXNotRecognizedException | SAXNotSupportedException e) {

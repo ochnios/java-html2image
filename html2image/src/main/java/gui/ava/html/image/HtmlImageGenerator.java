@@ -63,8 +63,8 @@ public class HtmlImageGenerator {
 
     public void loadHtml(String html) {
         editorPane.setEditable(false);
-        editorPane.setText(html);
         editorPane.setContentType("text/html");
+        editorPane.setText(html);
         onDocumentLoad();
     }
 
@@ -136,8 +136,7 @@ public class HtmlImageGenerator {
         }
     }
 
-    protected void onDocumentLoad() {
-    }
+    protected void onDocumentLoad() {}
 
     public Dimension getDefaultSize() {
         return DEFAULT_SIZE;

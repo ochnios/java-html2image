@@ -36,4 +36,27 @@ public class ImageRendererImplTest extends BaseTest {
 		renderer.saveImage(getTestOutputFile("test.bmp"));
 	}
 
+	static final String html5 = """
+			<!DOCTYPE html>
+			<html>
+				<head>
+					<meta charset="UTF-8">
+					<style>
+						h1 { color: red; }
+					</style>
+				</head>
+				<body>
+					<h1>Hello html5 world!</h1>
+				</body>
+			</html>
+			""";
+
+
+	@Test
+	public void testHtml5() throws Exception {
+		//parser.loadHtml(html5);
+		parser.load( getURL("html5.html") );
+		renderer.saveImage(getTestOutputFile("html5.jpg"));
+	}
+
 }
