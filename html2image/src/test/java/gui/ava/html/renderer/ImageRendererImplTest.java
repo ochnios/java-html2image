@@ -59,4 +59,40 @@ public class ImageRendererImplTest extends BaseTest {
 		renderer.saveImage(getTestOutputFile("html5.jpg"));
 	}
 
+
+	static final String html_inline_block = """
+			<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+				.container {
+					background-color: DodgerBlue;
+				}
+				.container > div {
+					display: inline-block;
+					background-color: #f1f1f1;
+					margin: 10px;
+					padding: 20px;
+					font-size: 30px;
+					text-align: center;
+				}
+			</style>
+			</head>
+			<body>
+				<h1>Inline Block divs</h1>
+				<div class="container">
+					<div style="width: 32px">1</div>
+					<div style="width: 64px">2</div>
+					<div>3</div>
+				</div>
+			</body>
+			</html>
+			""";
+
+	@Test
+	public void testInlineBlock() throws Exception {
+		parser.loadHtml(html_inline_block);
+		renderer.saveImage(getTestOutputFile("inline.png"));
+	}
+
 }
