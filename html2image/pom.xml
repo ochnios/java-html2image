@@ -12,6 +12,17 @@
 	<name>html2image</name>
 	<url>https://maven.apache.org</url>
 
+	<repositories>
+		<repository>
+			<id>atlassian-3rdparty</id>
+			<url>https://packages.atlassian.com/maven-3rdparty/</url>
+		</repository>
+		<repository>
+			<id>atlassian-public</id>
+			<url>https://packages.atlassian.com/maven-public/</url>
+		</repository>
+	</repositories>
+
 	<!-- Java 17 LTS -->
 	<properties>
 		<java.version>17</java.version>
@@ -28,11 +39,17 @@
 
 		<!-- ==== PARSING ====================================== -->
 
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.12.2</version>
+		</dependency>
+
 		<!-- NekoHtml 1.9.x -->
 		<dependency>
 			<groupId>net.sourceforge.nekohtml</groupId>
 			<artifactId>nekohtml</artifactId>
-			<version>1.9.22</version>
+			<version>1.9.22-atlassian-5</version>
 		</dependency>
 
 			<!-- Neko HtmlUnit version without Xerces is very limited! -->
