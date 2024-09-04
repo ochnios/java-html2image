@@ -1,0 +1,6 @@
+jdk:
+  - openjdk17
+before_install:
+  - sdk list java
+  - sdk install java 22-open
+  - sdk use java 22-open

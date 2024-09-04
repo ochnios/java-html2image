@@ -1,5 +1,13 @@
 package gui.ava.html;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URI;
+import java.net.URL;
+
+import org.w3c.dom.Document;
+
 import gui.ava.html.imagemap.HtmlImageMap;
 import gui.ava.html.imagemap.HtmlImageMapImpl;
 import gui.ava.html.parser.HtmlParser;
@@ -8,19 +16,14 @@ import gui.ava.html.pdf.PdfRenderer;
 import gui.ava.html.pdf.PdfRendererImpl;
 import gui.ava.html.renderer.ImageRenderer;
 import gui.ava.html.renderer.ImageRendererImpl;
-import org.w3c.dom.Document;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URI;
-import java.net.URL;
 
 /**
  * @author Yoav Aharoni
  */
 public class Html2Image {
-	private HtmlParser parser = new HtmlParserImpl();
+
+	private final HtmlParser parser = new HtmlParserImpl();
+
 	private HtmlImageMap htmlImageMap;
 	private ImageRenderer imageRenderer;
 	private PdfRenderer pdfRenderer;
@@ -91,4 +94,5 @@ public class Html2Image {
 		html2Image.getParser().load(inputStream);
 		return html2Image;
 	}
+
 }

@@ -1,16 +1,17 @@
 package gui.ava.html.imagemap;
 
-import org.w3c.dom.Element;
-
 import java.io.File;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 
+import org.w3c.dom.Element;
+
 /**
  * @author Yoav Aharoni
  */
 public interface HtmlImageMap {
+
 	Map<Element, Collection<ElementBox>> getClickableBoxes();
 
 	String getImageMap(String mapName, String imageURL);
@@ -24,4 +25,5 @@ public interface HtmlImageMap {
 	void saveImageMapDocument(File file, String imageURL);
 
 	void saveImageMapDocument(Writer writer, String imageURL, boolean closeWriter);
+
 }

@@ -1,29 +1,29 @@
 package gui.ava.html.image;
 
-import gui.ava.html.image.util.FormatNameUtil;
-import gui.ava.html.image.util.SynchronousHTMLEditorKit;
-import gui.ava.html.link.LinkInfo;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+import gui.ava.html.link.LinkInfo;
+import gui.ava.html.util.FormatNameUtil;
 
 /**
  * @author Yoav Aharoni
  */
 public class HtmlImageGenerator {
-    private JEditorPane editorPane;
-    static final Dimension DEFAULT_SIZE = new Dimension(800, 800);
+
+    private static final Dimension DEFAULT_SIZE = new Dimension(800, 800);
+
+    private final JEditorPane editorPane;
 
     public HtmlImageGenerator() {
         editorPane = createJEditorPane();
@@ -63,8 +63,8 @@ public class HtmlImageGenerator {
 
     public void loadHtml(String html) {
         editorPane.setEditable(false);
-        editorPane.setText(html);
         editorPane.setContentType("text/html");
+        editorPane.setText(html);
         onDocumentLoad();
     }
 
@@ -72,15 +72,15 @@ public class HtmlImageGenerator {
         final StringBuilder markup = new StringBuilder();
         markup.append("<map name=\"").append(mapName).append("\">\n");
         for (LinkInfo link : getLinks()) {
-            final List<Rectangle> bounds = link.getBounds();
-            for (Rectangle bound : bounds) {
+            final List<Rectangle2D> bounds = link.getBounds();
+            for (Rectangle2D bound : bounds) {
                 final int x1 = (int) bound.getX();
                 final int y1 = (int) bound.getY();
                 final int x2 = (int) (x1 + bound.getWidth());
                 final int y2 = (int) (y1 + bound.getHeight());
                 markup.append(String.format("<area href=\"%s\" coords=\"%s,%s,%s,%s\" shape=\"rect\"", link.getHref(), x1, y1, x2, y2));
                 final String title = link.getTitle();
-                if (title != null && !title.equals("")) {
+                if (title != null && !title.isEmpty()) {
                     markup.append(" title=\"").append(title.replace("\"", "&quot;")).append("\"");
                 }
                 markup.append(">\n");
@@ -101,9 +101,7 @@ public class HtmlImageGenerator {
     }
 
     public void saveAsHtmlWithMap(File file, String imageUrl) {
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(file);
+        try (FileWriter writer = new FileWriter(file)) {
             writer.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
             writer.append("<html>\n<head></head>\n");
             writer.append("<body style=\"margin: 0; padding: 0; text-align: center;\">\n");
@@ -115,15 +113,7 @@ public class HtmlImageGenerator {
             writer.append("</body>\n</html>");
         } catch (IOException e) {
             throw new RuntimeException(String.format("Exception while saving '%s' html file", file), e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException ignore) {
-                }
-            }
         }
-
     }
 
     public void saveAsImage(String file) {
@@ -146,8 +136,7 @@ public class HtmlImageGenerator {
         }
     }
 
-    protected void onDocumentLoad() {
-    }
+    protected void onDocumentLoad() {}
 
     public Dimension getDefaultSize() {
         return DEFAULT_SIZE;
@@ -179,25 +168,35 @@ public class HtmlImageGenerator {
         final SynchronousHTMLEditorKit kit = new SynchronousHTMLEditorKit();
         editorPane.setEditorKitForContentType("text/html", kit);
         editorPane.setContentType("text/html");
-        editorPane.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("page")) {
-                    onDocumentLoad();
-                }
+        editorPane.addPropertyChangeListener(event -> {
+            if (event.getPropertyName().equals("page")) {
+                onDocumentLoad();
             }
         });
         return editorPane;
     }
 
     public void show() {
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        JFrame frame = new JFrame();
-        frame.setTitle("My First Swing Application");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        JLabel label = new JLabel("Welcome");
-        frame.add(label);
-        frame.add(editorPane);
-        frame.pack();
-        frame.setVisible(true);
+        // the main window
+        final JFrame view = new JFrame();
+
+        // create the view
+        view.setTitle("HtmlImageGenerator");
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JLabel label = new JLabel("Label");
+        view.add(label);
+        view.add(editorPane);
+        view.pack();
+
+        // set the system look & feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            SwingUtilities.updateComponentTreeUI(view);
+        } catch (Exception ignored) {}
+
+        // show the view
+        view.setLocationByPlatform(true);
+        view.setVisible(true);
     }
+
 }
